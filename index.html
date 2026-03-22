@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TYL – Tyler Technologies | TFG Investment Research</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #111;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 24px;
+    background: #fff;
+  }
+  .report-masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #1a1a2e;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  .report-masthead .firm-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: #1a1a2e;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .report-masthead .report-label {
+    font-size: 12px;
+    color: #555;
+  }
+
+  /* HEADER TABLE */
+  .header-table {
+    width: 100%;
+    font-size: 15px;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+  }
+  .header-table th {
+    background-color: #1a1a2e;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .header-table td {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+  }
+  .valuation-row td {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+  .valuation-row td .val-number {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a2e;
+    display: block;
+    margin-top: 3px;
+  }
+
+  /* DATA BLOCK */
+  .data-block {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+  .company-snapshot {
+    flex: 0 0 280px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .company-snapshot h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #1a1a2e;
+  }
+  .right-column {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* PRICE RANGE BAR */
+  .price-range-bar {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+  .price-range-bar th {
+    background-color: #1a1a2e;
+    color: white;
+    padding: 6px 8px;
+    text-align: center;
+  }
+  .price-range-bar td {
+    padding: 6px 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+    line-height: 1.4;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  /* CHART */
+  .chart-container {
+    width: 100%;
+    height: 220px;
+    margin-bottom: 0;
+  }
+
+  /* FINANCIAL TABLE */
+  .financial-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .financial-table th {
+    background-color: #1a1a2e;
+    color: white;
+    padding: 8px 10px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .financial-table th:first-child {
+    text-align: left;
+  }
+  .financial-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .financial-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+  .financial-table tr:nth-child(even) {
+    background-color: #f7f7f7;
+  }
+  .financial-table .section-divider td {
+    background-color: #eef0f7;
+    font-weight: bold;
+    font-size: 13px;
+    color: #1a1a2e;
+    padding: 4px 10px;
+    letter-spacing: 0.03em;
+  }
+
+  /* NARRATIVE */
+  .narrative {
+    font-size: 17px;
+    line-height: 1.85;
+    max-width: 960px;
+    border-top: 2px solid #1a1a2e;
+    padding-top: 24px;
+  }
+  .narrative p {
+    margin-bottom: 20px;
+  }
+  .analyst-sig {
+    font-size: 15px;
+    color: #555;
+    margin-top: 24px;
+    font-style: italic;
+  }
+
+  /* TAB NAVIGATION */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #1a1a2e;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    border: none;
+    background: #f0f0f5;
+    color: #444;
+    cursor: pointer;
+    border-top: 2px solid transparent;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    margin-bottom: -2px;
+  }
+  .tab-btn:first-child { border-left: 2px solid #ccc; }
+  .tab-btn.active {
+    background: #fff;
+    color: #1a1a2e;
+    font-weight: bold;
+    border-top: 2px solid #1a1a2e;
+    border-bottom: 2px solid #fff;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* SCORECARD */
+  .scorecard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .scorecard-item {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px 16px;
+  }
+  .scorecard-item .sc-label {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  .scorecard-item .sc-val {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1a1a2e;
+  }
+  .scorecard-item .sc-sub {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .sc-pos { border-left: 4px solid #27ae60; }
+  .sc-neg { border-left: 4px solid #c0392b; }
+  .sc-neu { border-left: 4px solid #e67e22; }
+
+  .disclaimer {
+    font-size: 12px;
+    color: #888;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 12px;
+    margin-top: 40px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="report-masthead">
+  <div>
+    <div class="firm-name">The Fedeli Group &nbsp;|&nbsp; TFG Family Investment Research</div>
+    <div class="report-label">Institutional Equity Research &nbsp;·&nbsp; March 22, 2026</div>
+  </div>
+  <div style="font-size:13px; color:#555; text-align:right;">
+    S&amp;P 500 Component &nbsp;·&nbsp; NYSE: TYL &nbsp;·&nbsp; GovTech / Vertical SaaS
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1 — HEADER TABLE
+═══════════════════════════════════════════ -->
+<table class="header-table">
+  <thead>
+    <tr>
+      <th>Company &amp; Ticker</th>
+      <th>Recent Price</th>
+      <th>Trailing P/E</th>
+      <th>Forward P/E</th>
+      <th>Div. Yield</th>
+      <th>Market Cap</th>
+      <th>Beta</th>
+      <th>Timeliness</th>
+      <th>Safety</th>
+      <th>Fin. Strength</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Tyler Technologies (TYL)</strong></td>
+      <td><strong>$344.00</strong></td>
+      <td>47.8×</td>
+      <td>27.5×</td>
+      <td>Nil</td>
+      <td>~$14.8B</td>
+      <td>0.44</td>
+      <td>3</td>
+      <td>2</td>
+      <td>A</td>
+    </tr>
+    <tr class="valuation-row">
+      <td colspan="3">
+        EV/EBITDA (TTM)
+        <span class="val-number">30.3×</span>
+      </td>
+      <td colspan="2">
+        EV/EBITDA +1 Yr (E)
+        <span class="val-number">~22.5×</span>
+      </td>
+      <td colspan="2">
+        EV/EBITDA +2 Yr (E)
+        <span class="val-number">~18.8×</span>
+      </td>
+      <td colspan="3">
+        PEG Ratio
+        <span class="val-number">1.92</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2 — DATA BLOCK
+═══════════════════════════════════════════ -->
+<div class="data-block">
+
+  <!-- LEFT: Company Snapshot -->
+  <div class="company-snapshot">
+    <h2>Company Snapshot</h2>
+    <p>Tyler Technologies is the dominant provider of integrated software and technology solutions exclusively to U.S. state and local governments — a 15,000+ client base spanning courts, ERP, payments, permitting, public safety dispatch, and property appraisal. The company operates in two segments: Enterprise Software (mission-critical back-office ERP, courts, and justice) and Platform Technologies (payment processing, digital government, data/analytics, and AI-enabled services).</p>
+
+    <p>With $2.33B in 2025 revenue and $2.1B in annualized recurring revenue, Tyler is effectively a monopoly in the smallest-to-mid-size government vertical — an addressable market chronically under-served by enterprise software giants. Its competitive moat rests on deep switching costs, regulatory integration, and 45,000+ live installations. The key risk is deceleration of the SaaS "cloud flip" pipeline (currently ~50% of the installed base still on-premise) and any macro pressure reducing municipal IT budgets.</p>
+
+    <p>The stock has fallen ~47% from its February 2025 all-time high of $661, driven by a Q4 2025 revenue/EPS miss, soft 2026 guidance relative to consensus, and a Texas payments contract loss — creating a potential value entry for long-term buyers. At current prices, TYL trades at a meaningful discount to its 5-year average EV/EBITDA.</p>
+
+    <p style="font-size:14px; color:#444; margin-top:14px; line-height:1.7;">
+      <strong>HQ:</strong> Plano, Texas<br>
+      <strong>CEO:</strong> Lynn Moore<br>
+      <strong>Ticker:</strong> NYSE: TYL<br>
+      <strong>Web:</strong> tylertech.com
+    </p>
+  </div>
+
+  <!-- RIGHT: Price Bar + Chart + Table -->
+  <div class="right-column">
+
+    <!-- PRICE RANGE BAR -->
+    <table class="price-range-bar">
+      <thead>
+        <tr>
+          <th>PRICE RANGE</th>
+          <th>2021</th>
+          <th>2022</th>
+          <th>2023</th>
+          <th>2024</th>
+          <th>2025</th>
+          <th>2026 (E)</th>
+          <th>2027 (E)</th>
+          <th>'28–'30 (E)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:bold; font-size:12px;">Ann'l High / Low</td>
+          <td>H: $686<br>L: $434</td>
+          <td>H: $545<br>L: $258</td>
+          <td>H: $434<br>L: $285</td>
+          <td>H: $620<br>L: $378</td>
+          <td>H: $661<br>L: $344</td>
+          <td>—<br>—</td>
+          <td>—<br>—</td>
+          <td>—<br>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CHART: EPS Bars + Relative P/E Line -->
+    <div class="chart-container">
+      <canvas id="tyl-chart"></canvas>
+    </div>
+
+    <!-- FINANCIAL TABLE -->
+    <table class="financial-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Fiscal Year</th>
+          <th>2021</th>
+          <th>2022</th>
+          <th>2023</th>
+          <th>2024</th>
+          <th>2025</th>
+          <th>2026 (E)</th>
+          <th>2027 (E)</th>
+          <th>'28–'30 (E)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Per-Share Data -->
+        <tr class="section-divider"><td colspan="9">PER-SHARE DATA</td></tr>
+        <tr>
+          <td>Revenues per Share</td>
+          <td>$37.45</td>
+          <td>$43.47</td>
+          <td>$45.81</td>
+          <td>$49.47</td>
+          <td>$53.71</td>
+          <td>$58.65 (E)</td>
+          <td>$64.30 (E)</td>
+          <td>$75–$90 (E)</td>
+        </tr>
+        <tr>
+          <td>"Cash Flow" per Share</td>
+          <td>$13.25</td>
+          <td>$14.40</td>
+          <td>$16.85</td>
+          <td>$19.20</td>
+          <td>$22.18</td>
+          <td>$25.50 (E)</td>
+          <td>$29.00 (E)</td>
+          <td>$36–$44 (E)</td>
+        </tr>
+        <tr>
+          <td>Earnings per Share</td>
+          <td>$3.82</td>
+          <td>$3.87</td>
+          <td>$3.88</td>
+          <td>$6.05</td>
+          <td>$7.20</td>
+          <td>$8.50 (E)</td>
+          <td>$10.15 (E)</td>
+          <td>$14–$18 (E)</td>
+        </tr>
+        <tr>
+          <td>Dist. Decl'd per Share</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+        </tr>
+        <tr>
+          <td>Cap'l Spending per Share</td>
+          <td>$1.34</td>
+          <td>$1.16</td>
+          <td>$1.06</td>
+          <td>$0.78</td>
+          <td>$0.74</td>
+          <td>$0.57 (E)</td>
+          <td>$0.55 (E)</td>
+          <td>$0.50–$0.60 (E)</td>
+        </tr>
+        <tr>
+          <td>Book Value per Share</td>
+          <td>$62.18</td>
+          <td>$68.50</td>
+          <td>$72.40</td>
+          <td>$78.20</td>
+          <td>$83.50</td>
+          <td>$89.00 (E)</td>
+          <td>$96.00 (E)</td>
+          <td>$115–$135 (E)</td>
+        </tr>
+        <tr>
+          <td>Shares/Units Outstanding (M)</td>
+          <td>42.5</td>
+          <td>42.6</td>
+          <td>42.6</td>
+          <td>43.2</td>
+          <td>43.4</td>
+          <td>43.5 (E)</td>
+          <td>43.2 (E)</td>
+          <td>~42.5 (E)</td>
+        </tr>
+
+        <!-- Valuation -->
+        <tr class="section-divider"><td colspan="9">VALUATION</td></tr>
+        <tr>
+          <td>Avg Ann'l P/E Ratio</td>
+          <td>141×</td>
+          <td>103×</td>
+          <td>92×</td>
+          <td>79×</td>
+          <td>73×</td>
+          <td>40× (E)</td>
+          <td>34× (E)</td>
+          <td>20–25× (E)</td>
+        </tr>
+        <tr>
+          <td>Relative P/E Ratio</td>
+          <td>5.9</td>
+          <td>4.9</td>
+          <td>4.0</td>
+          <td>3.4</td>
+          <td>3.0</td>
+          <td>1.8 (E)</td>
+          <td>1.5 (E)</td>
+          <td>0.9–1.1 (E)</td>
+        </tr>
+        <tr>
+          <td>Avg Ann'l Dist. Yield</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+        </tr>
+
+        <!-- Income Statement -->
+        <tr class="section-divider"><td colspan="9">INCOME STATEMENT ($M)</td></tr>
+        <tr>
+          <td>Revenues ($mill)</td>
+          <td>$1,592</td>
+          <td>$1,850</td>
+          <td>$1,952</td>
+          <td>$2,138</td>
+          <td>$2,332</td>
+          <td>$2,525 (E)</td>
+          <td>$2,776 (E)</td>
+          <td>$3,200–$3,900 (E)</td>
+        </tr>
+        <tr>
+          <td>Operating Margin (%)</td>
+          <td>11.4%</td>
+          <td>12.0%</td>
+          <td>12.5%</td>
+          <td>14.0%</td>
+          <td>15.3%</td>
+          <td>17.0% (E)</td>
+          <td>18.5% (E)</td>
+          <td>21–24% (E)</td>
+        </tr>
+        <tr>
+          <td>Depreciation ($mill)</td>
+          <td>$55</td>
+          <td>$59</td>
+          <td>$60</td>
+          <td>$58</td>
+          <td>$55</td>
+          <td>$54 (E)</td>
+          <td>$56 (E)</td>
+          <td>$55–$65 (E)</td>
+        </tr>
+        <tr>
+          <td>Net Profit ($mill)</td>
+          <td>$161.5</td>
+          <td>$164.2</td>
+          <td>$165.9</td>
+          <td>$263.2</td>
+          <td>$315.6</td>
+          <td>$370 (E)</td>
+          <td>$438 (E)</td>
+          <td>$600–$780 (E)</td>
+        </tr>
+        <tr>
+          <td>Income Tax Rate (%)</td>
+          <td>21.0%</td>
+          <td>18.5%</td>
+          <td>16.5%</td>
+          <td>14.8%</td>
+          <td>17.5%</td>
+          <td>23.5% (E)</td>
+          <td>23.0% (E)</td>
+          <td>23–24% (E)</td>
+        </tr>
+        <tr>
+          <td>Net Profit Margin (%)</td>
+          <td>10.1%</td>
+          <td>8.9%</td>
+          <td>8.5%</td>
+          <td>12.3%</td>
+          <td>13.5%</td>
+          <td>14.7% (E)</td>
+          <td>15.8% (E)</td>
+          <td>18–20% (E)</td>
+        </tr>
+
+        <!-- Balance Sheet / Capital -->
+        <tr class="section-divider"><td colspan="9">CAPITAL STRUCTURE &amp; RETURNS</td></tr>
+        <tr>
+          <td>Working Cap'l ($mill)</td>
+          <td>$485</td>
+          <td>$312</td>
+          <td>$240</td>
+          <td>$(48)</td>
+          <td>$(52)</td>
+          <td>$(30) (E)</td>
+          <td>$50 (E)</td>
+          <td>$100–$200 (E)</td>
+        </tr>
+        <tr>
+          <td>Long-Term Debt ($mill)</td>
+          <td>$1,415</td>
+          <td>$1,060</td>
+          <td>$740</td>
+          <td>$597</td>
+          <td>$600</td>
+          <td>$350 (E)</td>
+          <td>$100 (E)</td>
+          <td>~$0 (E)</td>
+        </tr>
+        <tr>
+          <td>Shareholders' Capital ($mill)</td>
+          <td>$2,643</td>
+          <td>$2,918</td>
+          <td>$3,087</td>
+          <td>$3,380</td>
+          <td>$3,624</td>
+          <td>$3,876 (E)</td>
+          <td>$4,147 (E)</td>
+          <td>$4,900–$5,700 (E)</td>
+        </tr>
+        <tr>
+          <td>Return on Total Cap'l (%)</td>
+          <td>3.9%</td>
+          <td>4.0%</td>
+          <td>4.4%</td>
+          <td>6.4%</td>
+          <td>8.2%</td>
+          <td>9.5% (E)</td>
+          <td>10.8% (E)</td>
+          <td>13–16% (E)</td>
+        </tr>
+        <tr>
+          <td>Return on Partners' Cap'l (%)</td>
+          <td>6.1%</td>
+          <td>5.6%</td>
+          <td>5.4%</td>
+          <td>7.8%</td>
+          <td>8.7%</td>
+          <td>9.6% (E)</td>
+          <td>10.6% (E)</td>
+          <td>13–17% (E)</td>
+        </tr>
+        <tr>
+          <td>Retained to Partners' Cap'l (%)</td>
+          <td>100%</td>
+          <td>100%</td>
+          <td>100%</td>
+          <td>100%</td>
+          <td>100%</td>
+          <td>100% (E)</td>
+          <td>100% (E)</td>
+          <td>100% (E)</td>
+        </tr>
+        <tr>
+          <td>All Dist. to Net Profit (%)</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+          <td>Nil (E)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div><!-- /right-column -->
+</div><!-- /data-block -->
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3 — NARRATIVE (TABBED)
+═══════════════════════════════════════════ -->
+<div class="narrative">
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('gwfw', this)">Good for What?!?</button>
+    <button class="tab-btn" onclick="showTab('summary', this)">Executive Summary</button>
+    <button class="tab-btn" onclick="showTab('scorecard', this)">Performance Scorecard</button>
+    <button class="tab-btn" onclick="showTab('regime', this)">Regime Analysis</button>
+    <button class="tab-btn" onclick="showTab('riskreturn', this)">Risk/Return Profile</button>
+    <button class="tab-btn" onclick="showTab('fundsent', this)">Fundamentals vs. Sentiment</button>
+  </div>
+
+  <!-- Tab 1: Good for What?!? -->
+  <div id="gwfw" class="tab-panel active">
+    <p><strong>Good for What?!?</strong> — Tyler Technologies is good for investors who want durable, compounding exposure to one of the last underpenetrated software verticals in America: state and local government. The pitch is deceptively simple — 15,000 government clients running on aging systems, a 20%+ SaaS growth engine that has run for 19+ consecutive quarters, and roughly half the installed base still on-premise, creating a multi-year conversion runway with known economics. At roughly $344 per share — down 47% from its 2025 peak — the question is whether the stock is pricing in temporary friction or structural deterioration. The answer matters for how you size it.</p>
+
+    <p>What Tyler has built is not easily replicated. Governments don't churn software vendors. Once a county's ERP, court management, and payment processing are all on Tyler's platform, the cost of ripping it out is measured in years of disruption and millions in migration expense. This is stickiness that commercial SaaS companies would kill for, and it directly explains why Tyler's recurring revenue percentage has climbed from 73% in 2020 to 87% in 2025. The business compounds quietly, and the current selloff has created a valuation wedge between what the market is offering and what the long-term cash generation profile looks like if execution continues.</p>
+
+    <p>The tension: Tyler's 2026 guidance of $2.50–$2.55B came in below the street's $2.61B, and management cited "government entities paring back budgets due to economic uncertainty." That language — in this macro/political climate — is worth taking seriously. DOGE-style efficiency mandates at the federal level and tightening municipal budgets could slow deal cycles. Tyler's Q4 EPS of $2.64 missed consensus by $0.07, and a $9.7M non-cash loss reserve from a contract dispute clouded the print. None of this is catastrophic, but the stock's 47% drawdown reflects a market reassessing whether TYL deserves a premium multiple when near-term growth is decelerating from ~12% to 9%.</p>
+
+    <p>The variant perception case is that the bear narrative conflates near-term noise with long-term disruption of the cloud conversion thesis. The on-premise to SaaS "flip" economics are highly compelling — management has disclosed average flip multiples of 1.7–1.8× on legacy maintenance revenue — and Q4 2025 marked new quarterly highs for both number and value of flip signings. The conversion pipeline is not slowing; the headline revenue growth is suppressed by the mechanics of the transition model itself (recognizing revenue over a subscription term rather than upfront). FCF of $621M in 2025 (26.6% margin) tells a different story than the P&L, and that figure is expected to grow to 26–28% margin in 2026.</p>
+  </div>
+
+  <!-- Tab 2: Executive Summary -->
+  <div id="summary" class="tab-panel">
+    <p>Tyler Technologies delivered $2.33B in full-year 2025 revenue (+9.1% YoY), $650M in adjusted EBITDA (+14.5%), and $621M in free cash flow (+8.0%) — all within or ahead of guidance. GAAP EPS of $7.20 grew 20%, and non-GAAP EPS of $11.31 grew 19.3%. SaaS revenues crossed $778M for the year (+20.6%), marking 19+ consecutive quarters of 20%+ SaaS growth — a streak of extraordinary consistency for any enterprise software company. Annualized recurring revenue (ARR) finished at $2.1B, up 10.9%, providing strong forward revenue visibility. The Q4 2025 result contained one significant impairment: a $9.7M non-cash loss reserve tied to a previously disclosed contract dispute that reduced non-recurring revenues and operating income. Stripping this out, the underlying operational picture is cleaner than the headline suggests.</p>
+
+    <p>For 2026, management guided $2.50–$2.55B in total revenue (midpoint +8.5%), with non-GAAP EPS of $12.40–$12.65. The guidance landed below the prior consensus of ~$2.61B and was attributed to softness in government IT budgets, the termination of a Texas statewide payments contract (which accounts for most of the transaction revenue growth differential), and the natural deceleration of maintenance revenue as on-premise clients convert. The board authorized a new $1B share repurchase program — a strong signal of management's conviction in intrinsic value at current prices.</p>
+
+    <p>Rating: <strong>BUY.</strong> 12-month price target: <strong>$460</strong>, based on 27× forward 2027 non-GAAP EPS of $10.15(E) — a modest premium to intrinsic quality, discounted from the stock's historical premium multiple. The single condition that would cause a downgrade is evidence that government budget pressures are causing structural SaaS booking deceleration (not just timing) — specifically, two consecutive quarters of sub-10% ARR growth would warrant a reassessment of the growth premium embedded in the target.</p>
+  </div>
+
+  <!-- Tab 3: Scorecard -->
+  <div id="scorecard" class="tab-panel">
+    <div class="scorecard-grid">
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">SaaS Revenue Growth (2025)</div>
+        <div class="sc-val">+20.6%</div>
+        <div class="sc-sub">19th consecutive quarter ≥20%</div>
+      </div>
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">Free Cash Flow (2025)</div>
+        <div class="sc-val">$621M</div>
+        <div class="sc-sub">26.6% FCF margin; +8% YoY</div>
+      </div>
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">Recurring Revenue Mix</div>
+        <div class="sc-val">87.1%</div>
+        <div class="sc-sub">Up from 73.3% in 2020</div>
+      </div>
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">Annualized Recurring Revenue</div>
+        <div class="sc-val">$2.1B</div>
+        <div class="sc-sub">+10.9% YoY; strong visibility</div>
+      </div>
+      <div class="scorecard-item sc-neg">
+        <div class="sc-label">Q4 EPS vs. Consensus</div>
+        <div class="sc-val">Miss</div>
+        <div class="sc-sub">$2.64 vs. $2.71 est. (–2.6%)</div>
+      </div>
+      <div class="scorecard-item sc-neg">
+        <div class="sc-label">2026 Revenue Guidance vs. Street</div>
+        <div class="sc-val">Below</div>
+        <div class="sc-sub">$2.525B guide vs. $2.61B prior est.</div>
+      </div>
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">GAAP Operating Margin (2025)</div>
+        <div class="sc-val">15.3%</div>
+        <div class="sc-sub">Up 130bps YoY; expanding</div>
+      </div>
+      <div class="scorecard-item sc-neu">
+        <div class="sc-label">On-Premise Base Remaining</div>
+        <div class="sc-val">~50%</div>
+        <div class="sc-sub">Flip runway; but conversion pace uncertain</div>
+      </div>
+      <div class="scorecard-item sc-pos">
+        <div class="sc-label">Balance Sheet</div>
+        <div class="sc-val">Net Cash+</div>
+        <div class="sc-sub">$1.0B cash vs. $600M debt; D/E = 0.16</div>
+      </div>
+    </div>
+    <p>Tyler's 2025 scorecard reflects a business executing well at the operational level, with consistent SaaS momentum, margin expansion, and superior free cash flow conversion. The demerits are concentrated in near-term headline metrics that are partly a function of transition mechanics and macro-driven budget caution — not deteriorating competitive position. The stock's -47% drawdown from all-time highs appears to be an overreaction to guidance noise when evaluated against the durable characteristics of the recurring revenue base.</p>
+  </div>
+
+  <!-- Tab 4: Regime Analysis -->
+  <div id="regime" class="tab-panel">
+    <p>Tyler has operated across three distinct business regime phases since 2019. The first was the pre-NIC organic growth era (pre-2021): moderate single-digit revenue growth, high GAAP P/E multiples sustained by SaaS transition optionality, and a premium stock that traded as a pure growth story. The second regime was post-NIC acquisition (2021–2023): scale expansion via the $2.3B NIC deal that brought transaction-based payments and federal digital services, but suppressed GAAP earnings through amortization, integration costs, and COVID-revenue burn-off from TourHealth contracts. EPS stagnated at $3.82–$3.88 for three years, and the multiple compressed sharply from over 140× to the 70s — a painful de-rating that had little to do with underlying business quality.</p>
+
+    <p>The current regime (2024–present) is best described as the earnings realization phase: the integration overhang is clearing, amortization loads are rolling off, and GAAP EPS is finally accelerating — up 55% in 2024 and 20% in 2025. The 2025 ATH reflected the market's recognition of this earnings inflection. The current pullback has introduced a new question: is Tyler entering a fourth regime characterized by structural growth deceleration, or is this a temporary air pocket before the on-premise conversion wave accelerates? Management's "extremely optimistic" language entering 2026, combined with Q4 flip signings at new highs, argues for the latter — but the Texas contract loss and budget caution language demand respect.</p>
+
+    <p>The critical regime indicator to watch is ARR growth. If it sustains 10–12% (the company's own stated long-term target), the stock is cheap here. If it dips below 8% for two or more quarters, the growth premium embedded in any reasonable price target evaporates quickly and the stock becomes a value trap at current multiples.</p>
+  </div>
+
+  <!-- Tab 5: Risk/Return Profile -->
+  <div id="riskreturn" class="tab-panel">
+    <p><strong>Bull case ($560–$600):</strong> ARR growth re-accelerates to 12–13% on the strength of the on-premise flip cycle (Q4 2025 flip signings were record highs; management expects the conversion runway through 2027–2028 to be driven by larger county and state systems). Non-GAAP EPS reaches $12.50–$13.00 in 2026 and $15+ in 2027, supporting a re-rating back toward 35–38× forward earnings. FCF margin expands to 28%+, funding both buybacks and bolt-on acquisitions without dilution. The $1B buyback authorization at current depressed prices is highly accretive — at $344/share, Tyler could retire ~5% of float.</p>
+
+    <p><strong>Base case ($440–$480):</strong> 2026 plays out roughly in line with guidance; SaaS sustains ~20% growth; transaction revenue recovers partially as the Texas contract loss is offset by new wins. GAAP operating margins expand 150–200bps annually as the business scales. EPS inflects toward $10+ on a non-GAAP basis in 2027. Multiple stabilizes at 25–28× forward as investors gain confidence in the deceleration narrative being transitory, not structural.</p>
+
+    <p><strong>Bear case ($230–$280):</strong> Budget pressures on state/local governments prove more durable than expected — particularly if federal funding cuts to municipalities materialize. SaaS bookings decelerate to mid-teens; transaction revenue stagnates. The AI disruption risk — which is underappreciated by the Street — manifests in longer decision cycles as agencies evaluate whether AI tools can substitute for some Tyler workflow automation. The $600M convertible note due 2026 adds a near-term refinancing variable. At 20× on $12 EPS, the stock finds support around $240 in the downside scenario.</p>
+
+    <p><strong>Key risk not in the consensus narrative:</strong> Tyler's "AI moat" story — that deep public-sector data creates an insuperable advantage — is compelling but unproven at commercial scale. The same government relationships that make Tyler sticky also make government clients cautious about AI deployment. There is a plausible scenario where AI slows, rather than accelerates, the migration cycle as agencies delay decisions pending clearer regulatory frameworks around AI in public administration. This risk is not priced in and not discussed by sell-side coverage.</p>
+  </div>
+
+  <!-- Tab 6: Fundamentals vs. Sentiment -->
+  <div id="fundsent" class="tab-panel">
+    <p>The gap between TYL's fundamental trajectory and market sentiment is unusually wide right now. Fundamentally, Tyler is in the best shape it has ever been: recurring revenue mix at 87% (versus 73% five years ago), a net cash balance sheet with $1B in liquidity, 19+ consecutive quarters of 20%+ SaaS growth, and a free cash flow machine generating $621M annually at a 26.6% margin. These are compounding flywheel metrics. Earnings quality is high — FCF consistently runs ahead of GAAP net income, suggesting reported earnings are being conservatively stated. The gap between non-GAAP EPS ($11.31) and GAAP EPS ($7.20) in 2025 is almost entirely explained by stock-based comp and acquisition intangibles amortization — both legitimate add-backs for a software business in transition.</p>
+
+    <p>Sentiment, by contrast, is bearish and getting worse. The stock is down 47% from its ATH, trailing twelve-month short interest is at 3.57% (elevated for TYL historically), sell-side price target cuts have been aggressive ($603 to $440+ at several firms), and the stock was trading at a 52-week low within days of the Q4 print. The "government budget uncertainty" narrative has real teeth in the current political environment — DOGE and federal efficiency mandates create genuine noise about downstream municipal funding — but TYL's customer base is primarily county and city, not federal, and the correlation between federal budget actions and local government IT spending is lagged and partial.</p>
+
+    <p>The variant perception this report wants to flag explicitly: the Street is treating the Q4 miss and soft 2026 guide as evidence of a weakening competitive position, when the more probable explanation is a combination of transition mechanics (on-premise to SaaS revenue timing), one idiosyncratic contract loss (Texas payments), and macro-driven deal-cycle elongation. None of these are permanent. Tyler's recurring revenue base of $2.1B in ARR — growing at 10.9% — is a compounding anchor that limits downside duration. If the bear case does not include a structural SaaS bookings collapse, buying the 47% drawdown of one of the highest-quality public-sector software businesses in the world has historically been correct.</p>
+  </div>
+
+  <p class="analyst-sig">TFG Family Investment Research | Ryan, CIO | Report Date: March 22, 2026 | Next Expected Earnings: Late April 2026 (Q1 2026)</p>
+</div>
+
+<div class="disclaimer">
+  <strong>Disclaimer:</strong> This report is produced for internal investment research purposes by The Fedeli Group (TFG Family). It does not constitute a solicitation or offer to buy or sell any security. All estimates marked (E) represent the analyst's projections and are subject to material uncertainty. Past performance does not guarantee future results. The Fedeli Group and/or its clients may hold positions in securities mentioned. Data sourced from company filings, SEC releases, and third-party financial data providers.
+</div>
+
+<!-- ═══ CHART.JS SCRIPT ═══ -->
+<script>
+  const years = ['2021','2022','2023','2024','2025','2026(E)','2027(E)'];
+  const epsActual = [3.82, 3.87, 3.88, 6.05, 7.20, null, null];
+  const epsEst    = [null, null, null, null, 7.20, 8.50, 10.15];
+
+  // Relative P/E: actual avg P/E / S&P 500 avg P/E (approx 24)
+  const relPEActual = [141/24, 103/24, 92/24, 79/24, 73/24, null, null];
+  const relPEEst    = [null, null, null, null, null, 40/24, 34/24];
+
+  const ctx = document.getElementById('tyl-chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'EPS ($) — Actual',
+          data: epsActual,
+          backgroundColor: '#1a1a2e',
+          yAxisID: 'y',
+          order: 2
+        },
+        {
+          label: 'EPS ($) — Estimate',
+          data: epsEst,
+          backgroundColor: '#7f8fa6',
+          yAxisID: 'y',
+          order: 2
+        },
+        {
+          label: 'Relative P/E — Actual',
+          data: relPEActual,
+          type: 'line',
+          borderColor: '#c0392b',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#c0392b',
+          fill: false,
+          yAxisID: 'y2',
+          order: 1
+        },
+        {
+          label: 'Relative P/E — Estimate',
+          data: relPEEst,
+          type: 'line',
+          borderColor: '#c0392b',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 4],
+          pointRadius: 4,
+          pointBackgroundColor: '#c0392b',
+          fill: false,
+          yAxisID: 'y2',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { boxWidth: 14, font: { size: 12 } }
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: { display: true, text: 'EPS ($)', font: { size: 12 } },
+          grid: { color: '#e8e8e8' }
+        },
+        y2: {
+          type: 'linear',
+          position: 'right',
+          title: { display: true, text: 'Relative P/E', font: { size: 12 } },
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
